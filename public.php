@@ -2,13 +2,13 @@
 
 
 /**
- * JFusion Public Class for PrestaShop
+ * JFusion Public Class for MRBS
  * 
  * PHP version 5
  * 
  * @category   JFusion
  * @package    JFusionPlugins
- * @subpackage PrestaShop
+ * @subpackage MRBS
  * @author     JFusion Team <webmaster@jfusion.org>
  * @copyright  2008 JFusion. All rights reserved.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU/GPL
@@ -21,12 +21,12 @@ defined('_JEXEC') or die('Restricted access');
 
 
 /**
- * JFusion Public Class for PrestaShop
+ * JFusion Public Class for MRBS
  * For detailed descriptions on these functions please check the model.abstractpublic.php
  * 
  * @category   JFusion
  * @package    JFusionPlugins
- * @subpackage PrestaShop
+ * @subpackage MRBS
  * @author     JFusion Team <webmaster@jfusion.org>
  * @copyright  2008 JFusion. All rights reserved.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU/GPL
@@ -34,7 +34,7 @@ defined('_JEXEC') or die('Restricted access');
  */
 
 
-class JFusionPublic_prestashop extends JFusionPublic {
+class JFusionPublic_mrbs extends JFusionPublic {
 
 
     /**
@@ -43,7 +43,7 @@ class JFusionPublic_prestashop extends JFusionPublic {
      */    
     function getJname() 
     {
-        return 'prestashop';
+        return 'mrbs';
     }
     
     function getRegistrationURL() {
