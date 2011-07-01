@@ -94,15 +94,15 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         if (!empty($config)) {
             //save the parameters into array
             $params = array();
-            $params['database_host'] = $config['_DB_SERVER_'];
-            $params['database_name'] = $config['_DB_NAME_'];
-            $params['database_user'] = $config['_DB_USER_'];
-            $params['database_password'] = $config['_DB_PASSWD_'];
-            $params['database_prefix'] = $config['_DB_PREFIX_'];
-            $params['database_type'] = $config['_DB_TYPE_'];
+            $params['database_host'] = $config['db_host'];
+            $params['database_name'] = $config['db_database'];
+            $params['database_user'] = $config['db_login'];
+            $params['database_password'] = $config['db_password'];
+            $params['database_prefix'] = $config['db_tbl_prefix'];
+            $params['database_type'] = $config['dbsys'];
             $params['source_path'] = $storePath;
             $params['cookie_key'] = $config['_COOKIE_KEY_'];
-			$params['usergroup'] = 1;
+			$params['usergroup'] = 0;
 			//return the parameters so it can be saved permanently
             return $params;
         }
