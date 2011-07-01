@@ -47,10 +47,10 @@ class JFusionPublic_mrbs extends JFusionPublic {
     }
     
     function getRegistrationURL() {
-        return 'authentication.php';
+        return 'admin.php';
     }
     function getLostPasswordURL() {
-        return 'password.php';
+        return '';
     }
 	function getLostUsernameURL() {
         return '';
