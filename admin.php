@@ -44,7 +44,7 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         return 'mrbs';
     }
     function getTablename() {
-        return 'customer';
+        return 'users';
     }
     function loadSetup($storePath) {
         //check for trailing slash and generate file path
@@ -112,7 +112,7 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         $db = JFusionFactory::getDatabase($this->getJname());
 		$params = JFusionFactory::getParams($this->getJname());
 		$tbp = $params->get('database_prefix');
-        $query = "SELECT email as email, id_customer as userid from " . $tbp . "customer WHERE email NOT LIKE '' and email IS NOT null";
+        $query = "SELECT email as email, id as userid from " . $tbp . "users WHERE email NOT LIKE '' and email IS NOT null";
         $db->setQuery($query);
         //getting the results
         $userlist = $db->loadObjectList();
