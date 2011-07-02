@@ -130,7 +130,7 @@ class JFusionAdmin_mrbs extends JFusionAdmin
             $params['database_prefix'] = $config['db_tbl_prefix'];
             $params['database_type'] = $config['dbsys'];
             $params['source_path'] = $storePath;
-            $params['cookie_key'] = $config['_COOKIE_KEY_'];
+            $params['cookie_key'] = ''; // not typical but can be modified
 			$params['usergroup'] = 0;
 			//return the parameters so it can be saved permanently
             return $params;
