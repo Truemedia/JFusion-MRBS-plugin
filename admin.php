@@ -89,36 +89,143 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         return $config;
 	}
 	
+	function getAndSetConfiguration($storePath) {
+        //check for trailing slash and generate file path
+        if (substr($storePath, -1) == DS) {
+            $myfile = $storePath . 'config.inc.php';
+        } else {
+            $myfile = $storePath . DS . 'config.inc.php';
+        }
+        if (($file_handle = @fopen($myfile, 'r')) === false) {
+            $result = false;
+            return $result;
+        } else {
+            //parse the file line by line to get only the config variables
+			$config = array();
+            $file_handle = fopen($myfile, 'r');
+            while (!feof($file_handle)) {
+                $line = fgets($file_handle);
+                if (strpos($line, '$aut') === 0 && count($config) <= 8) {
+                    /* extract the name and value, it was coded to avoid the use of eval() function */
+                    // name
+                    $vars_strt[0] = strpos($line, "th['") + strlen("th['");
+                    $vars_end[0] = strpos($line, "']['");
+                    $name = trim(substr($line, $vars_strt[0], $vars_end[0] - $vars_strt[0]), "'");     
+                    // key
+                    $vars_strt[1] = strpos($line, "']['") + strlen("']['");
+                    $vars_end[1] = strpos($line, "'] =");
+                    $key = str_replace("'", " ", trim(substr($line, $vars_strt[1], $vars_end[1] - $vars_strt[1]), "'"));
+                    // value
+                    $vars_strt[2] = strpos($line, "'] = '") + strlen("'] = '");
+                    $vars_end[2] = strpos($line, "';");
+                    $value = str_replace("'", " ", trim(substr($line, $vars_strt[2], $vars_end[2] - $vars_strt[2]), "'"));
+                    echo($name.' = '.$key.' => '.$value.'<br />');
+                    if($name !== "db_ext")
+                    {
+                    	 // name
+                    	$vars_strt[0] = strpos($line, "th['") + strlen("th['");
+                   		$vars_end[0] = strpos($line, "'] =");
+                    	$name = trim(substr($line, $vars_strt[0], $vars_end[0] - $vars_strt[0]), "'");
+                    	// value
+                    	$vars_strt[1] = strpos($line, "= '");
+                    	$vars_strt[1]++;
+                    	$vars_end[1] = strpos($line, "';");
+                    	$value = str_replace("'", " ", trim(substr($line, $vars_strt[1], $vars_end[1] - $vars_strt[1]), "'"));
+                    	echo($name.' = '.$value.'<br />');
+                    	// for 2 dimensional arrays
+                    	$config[$name] = $value;
+                    } 
+                    else{   
+                    	// for 3 dimensional arrays
+                    	$config[$name][$key] = $value;
+                    }
+                }
+            }
+	        fclose($file_handle);
+	    }
+        return $config;
+	}
+	
 	function setupFromPath($storePath) {
 	    $config = JFusionAdmin_mrbs::loadSetup($storePath);
         if (!empty($config)) {
-        	
+        	$auth = JFusionAdmin_mrbs::getAndSetConfiguration($storePath);
         	/*********************************************************************
  			* JFusion authentification settings (EDIT THESE SETTINGS WITH CAUTION)
  			*********************************************************************/
 			// How to validate the user/password. One of "none", "config", "db", "db_ext" (this is DEFAULT that JFusion adds), "pop3", "imap", "ldap" "nis" "nw" "ext"
-			$auth["type"] = "db_ext"; 
+			if($auth["type"] == "db_ext"){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 
 			// The server to connect to
-			$auth['db_ext']['db_system'] = $config['dbsys']; /* Or 'mysqli', 'pgsql' */
-			$auth['db_ext']['db_host'] = $config['db_host'];
+			if($auth['db_ext']['db_system'] == $config['dbsys']){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			}  /* Or 'mysqli', 'pgsql' */
+			if($auth['db_ext']['db_host'] == $config['db_host']){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			}
 
 			// The MySQL username and password to connect with
-			$auth['db_ext']['db_username'] = $config['db_login'];
-			$auth['db_ext']['db_password'] = $config['db_password'];
+			if($auth['db_ext']['db_username'] == $config['db_login']){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
+			if($auth['db_ext']['db_password'] == $config['db_password']){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 
 			// The name of the database.
-			$auth['db_ext']['db_name'] = $config['db_database'];
+			if($auth['db_ext']['db_name'] == $config['db_database']){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 
 			// The table that holds the authentication data
-			$auth['db_ext']['db_table'] = $config['db_tbl_prefix'].'users';
+			if($auth['db_ext']['db_table'] == $config['db_tbl_prefix'].'users'){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 
 			// The names of the two columns that hold the authentication data
-			$auth['db_ext']['column_name_username'] = 'name';
-			$auth['db_ext']['column_name_password'] = 'password';
+			if($auth['db_ext']['column_name_username'] == 'name'){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
+			if($auth['db_ext']['column_name_password'] == 'password'){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 
 			// This is the format of the password entries in the table. You can specify 'md5', 'sha1', 'crypt' or 'plaintext'
-			$auth['db_ext']['password_format'] = 'md5';
+			if($auth['db_ext']['password_format'] == 'md5'){
+				$true_logic[];
+			}
+			else{
+				$false_logic[];
+			} 
 			
 			/* PARAMS */
             //save the parameters into array
