@@ -92,6 +92,35 @@ class JFusionAdmin_mrbs extends JFusionAdmin
 	function setupFromPath($storePath) {
 	    $config = JFusionAdmin_mrbs::loadSetup($storePath);
         if (!empty($config)) {
+        	
+        	/*********************************************************************
+ 			* JFusion authentification settings (EDIT THESE SETTINGS WITH CAUTION)
+ 			*********************************************************************/
+			// How to validate the user/password. One of "none", "config", "db", "db_ext" (this is DEFAULT that JFusion adds), "pop3", "imap", "ldap" "nis" "nw" "ext"
+			$auth["type"] = "db_ext"; 
+
+			// The server to connect to
+			$auth['db_ext']['db_system'] = $config['dbsys']; /* Or 'mysqli', 'pgsql' */
+			$auth['db_ext']['db_host'] = $config['db_host'];
+
+			// The MySQL username and password to connect with
+			$auth['db_ext']['db_username'] = $config['db_login'];
+			$auth['db_ext']['db_password'] = $config['db_password'];
+
+			// The name of the database.
+			$auth['db_ext']['db_name'] = $config['db_database'];
+
+			// The table that holds the authentication data
+			$auth['db_ext']['db_table'] = $config['db_tbl_prefix'].'users';
+
+			// The names of the two columns that hold the authentication data
+			$auth['db_ext']['column_name_username'] = 'name';
+			$auth['db_ext']['column_name_password'] = 'password';
+
+			// This is the format of the password entries in the table. You can specify 'md5', 'sha1', 'crypt' or 'plaintext'
+			$auth['db_ext']['password_format'] = 'md5';
+			
+			/* PARAMS */
             //save the parameters into array
             $params = array();
             $params['database_host'] = $config['db_host'];
