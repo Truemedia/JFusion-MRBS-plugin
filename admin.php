@@ -100,6 +100,14 @@ class JFusionAdmin_mrbs extends JFusionAdmin
             $result = false;
             return $result;
         } else {
+        	// create backup file of current configuration (if it doesn't exist)
+			$backupfile = preg_replace('/(inc[\.])(php)$/i', '$1'."backup.".'$2', $myfile);
+			if(!file_exists($backupfile)){
+				if(!copy($myfile, $backupfile)){
+					return false;	
+				}
+			}
+		
             //parse the file line by line to get only the config variables
 			$config = array();
             $file_handle = fopen($myfile, 'r');
