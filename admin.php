@@ -164,69 +164,68 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         if (!empty($config)) {
         	$auth = JFusionAdmin_mrbs::getAndSetConfiguration($storePath);
         	$false_logic = array();
-        	
         	/*********************************************************************
  			* JFusion authentification settings (EDIT THESE SETTINGS WITH CAUTION)
  			*********************************************************************/
 			// How to validate the user/password. One of "none", "config", "db", "db_ext" (this is DEFAULT that JFusion adds), "pop3", "imap", "ldap" "nis" "nw" "ext"
 			if(!array_key_exists("type", $auth) && trim($auth['type']) !== "db_ext"){
-				$false_logic['type'] = "no";
+				$false_logic['type'] = "&#36;auth&#91;&#039;type&#039;&#93; &#61; &#039;db_ext&#039;&#59;";
 			} 
 
 			if(array_key_exists("db_ext", $auth)){ // if credentials exist at all
 				// The server to connect to
 				if(!array_key_exists("db_system", $auth['db_ext']) && $auth['db_ext']['db_system'] !== "mysql"/* Or 'mysqli', 'pgsql' */){
-					$false_logic['db_system'] = "no";
+					$false_logic['db_system'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_system&#039;&#93; &#61; &#039;mysql&#039;&#59;";
 				}  
 			
 				if(!array_key_exists("db_host", $auth['db_ext']) && !preg_match("/^([a-zA-Z0-9])+([.]){0,1}([a-zA-Z0-9])+([.]){0,1}([a-zA-Z0-9])*$/", $auth['db_ext']['db_host'])){
-					$false_logic['db_host'] = "no";
+					$false_logic['db_host'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_host&#039;&#93; &#61; &#039;localhost&#039;&#59; (replace localhost with your sql server address)";
 				}
 
 				// The MySQL username and password to connect with
 				if(!array_key_exists("db_username", $auth['db_ext']) && !preg_match("/^([a-zA-Z0-9])*$/", $auth['db_ext']['db_username'])){
-					$false_logic['db_username'] = "no";
+					$false_logic['db_username'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_username&#039;&#93; &#61; &#039;root&#039;&#59; (change root to your mysql username)";
 				}
 			 
 				if(!array_key_exists("db_password", $auth['db_ext']) && !preg_match("/^([a-zA-Z0-9])*$/", $auth['db_ext']['db_password'])){
-					$false_logic['db_password'] = "no";
+					$false_logic['db_password'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_password&#039;&#93; &#61; &#039;root&#039;&#59; (change root to your mysql password)";
 				} 
 
 				// The name of the database.
 				if(!array_key_exists("db_name", $auth['db_ext']) && !preg_match("/^([a-zA-Z0-9])*$/", $auth['db_ext']['db_name'])){
-					$false_logic['db_name'] = "no";
+					$false_logic['db_name'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_name&#039;&#93; &#61; &#039;mrbs&#039;&#59; (change mrbs to the name of the database you are using for MRBS)";
 				} 
 
 				// The table that holds the authentication data
 				if(!array_key_exists("db_table", $auth['db_ext']) && $auth['db_ext']['db_table'] !== "mrbs_".'users'){
-					$false_logic['db_table'] = "no";
+					$false_logic['db_table'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_table&#039;&#93; &#61; &#039;mrbs_users&#039;&#59; (change mrbs_ to the prefix you use for MRBS tables)";
 				} 
 
 				// The names of the two columns that hold the authentication data
 				if(!array_key_exists("column_name_username", $auth['db_ext']) && $auth['db_ext']['column_name_username'] !== 'name'){
-					$false_logic['column_name_username'] = "no";
+					$false_logic['column_name_username'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;column_name_username&#039;&#93; &#61; &#039;name&#039;&#59;";
 				} 
 			
 				if(!array_key_exists("column_name_password", $auth['db_ext']) && $auth['db_ext']['column_name_password'] !== 'password'){
-					$false_logic['column_name_password'] = "no";
+					$false_logic['column_name_password'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;column_name_password&#039;&#93; &#61; &#039;password&#039;&#59;";
 				} 
 
 				// This is the format of the password entries in the table. You can specify 'md5', 'sha1', 'crypt' or 'plaintext'
 				if(!array_key_exists("password_format", $auth['db_ext']) && $auth['db_ext']['password_format'] !== 'md5'){
-					$false_logic['password_format'] = "no";
+					$false_logic['password_format'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;password_format&#039;&#93; &#61; &#039;md5&#039;&#59;";
 				}
 			}
 		else{
-			$false_logic['type'] = "no";
-			$false_logic['db_system'] = "no";
-			$false_logic['db_host'] = "no";
-			$false_logic['db_username'] = "no";
-			$false_logic['db_password'] = "no";
-			$false_logic['db_name'] = "no";	
-			$false_logic['db_table'] = "no";
-			$false_logic['column_name_username'] = "no";
-			$false_logic['column_name_password'] = "no";
-			$false_logic['password_format'] = "no";
+				// send all errors for missing db_ext arrays
+				$false_logic['db_system'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_system&#039;&#93; &#61; &#039;mysql&#039;&#59;";
+				$false_logic['db_host'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_host&#039;&#93; &#61; &#039;localhost&#039;&#59; (replace localhost with your sql server address)";
+				$false_logic['db_username'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_username&#039;&#93; &#61; &#039;root&#039;&#59; (change root to your mysql username)";
+				$false_logic['db_password'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_password&#039;&#93; &#61; &#039;root&#039;&#59; (change root to your mysql password)";
+				$false_logic['db_name'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_name&#039;&#93; &#61; &#039;mrbs&#039;&#59; (change mrbs to the name of the database you are using for MRBS)";	
+				$false_logic['db_table'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;db_name&#039;&#93; &#61; &#039;mrbs_users&#039;&#59; (change mrbs_ to the prefix you use for MRBS tables)";
+				$false_logic['column_name_username'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;column_name_username&#039;&#93; &#61; &#039;name&#039;&#59;";
+				$false_logic['column_name_password'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;column_name_password&#039;&#93; &#61; &#039;password&#039;&#59;";
+				$false_logic['password_format'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;password_format&#039;&#93; &#61; &#039;md5&#039;&#59;";
 			}
 			if(count($false_logic) > 0){
 				JFusionAdmin_mrbs::AmmendConfiguration($false_logic);
