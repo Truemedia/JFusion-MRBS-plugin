@@ -154,9 +154,10 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         return $config;
 	}
 	
-	function AmmendConfiguration($errors){
+	function AmmendConfiguration($errors, $storePath){
 		// display error listing what changes need to be made to configuration manually
 		/* USE JFUSION ERROR REPORTING TO MENTION EACH MISSING ITEM return $errors; */
+		
 	}
 
 	function setupFromPath($storePath) {
@@ -234,13 +235,13 @@ class JFusionAdmin_mrbs extends JFusionAdmin
 			/* PARAMS */
             //save the parameters into array
             $params = array();
-            $params['database_host'] = $config['db_host'];
-            $params['database_name'] = $config['db_database'];
-            $params['database_user'] = $config['db_login'];
-            $params['database_password'] = $config['db_password'];
-            $params['database_prefix'] = $config['db_tbl_prefix'];
-            $params['database_type'] = $config['dbsys'];
-            $params['source_path'] = $storePath;
+            $params['database_host'] = trim($config['db_host']);
+            $params['database_name'] = trim($config['db_database']);
+            $params['database_user'] = trim($config['db_login']);
+            $params['database_password'] = trim($config['db_password']);
+            $params['database_prefix'] = trim($config['db_tbl_prefix']);
+            $params['database_type'] = trim($config['dbsys']);
+            $params['source_path'] = trim($storePath);
             $params['cookie_key'] = ''; // not typical but can be modified
 			$params['usergroup'] = 0;
 			//return the parameters so it can be saved permanently
