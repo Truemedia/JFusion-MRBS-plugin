@@ -127,7 +127,6 @@ class JFusionAdmin_mrbs extends JFusionAdmin
                     $vars_strt[2] = strpos($line, "'] = '") + strlen("'] = '");
                     $vars_end[2] = strpos($line, "';");
                     $value = str_replace("'", " ", trim(substr($line, $vars_strt[2], $vars_end[2] - $vars_strt[2]), "'"));
-                    echo($name.' = '.$key.' => '.$value.'<br />');
                     if($name !== "db_ext")
                     {
                     	 // name
@@ -139,7 +138,6 @@ class JFusionAdmin_mrbs extends JFusionAdmin
                     	$vars_strt[1]++;
                     	$vars_end[1] = strpos($line, "';");
                     	$value = str_replace("'", " ", trim(substr($line, $vars_strt[1], $vars_end[1] - $vars_strt[1]), "'"));
-                    	echo($name.' = '.$value.'<br />');
                     	// for 2 dimensional arrays
                     	$config[$name] = $value;
                     } 
@@ -161,9 +159,9 @@ class JFusionAdmin_mrbs extends JFusionAdmin
 	}
 
 	function setupFromPath($storePath) {
-	    $config = JFusionAdmin_mrbs::loadSetup($storePath);
+	    $config = JFusionAdmin_mrbs::loadSetup($storePath); // this is for db specific to data
         if (!empty($config)) {
-        	$auth = JFusionAdmin_mrbs::getAndSetConfiguration($storePath);
+        	$auth = JFusionAdmin_mrbs::getAndSetConfiguration($storePath); // this is for db specific to users
         	$false_logic = array();
         	/*********************************************************************
  			* JFusion authentification settings (EDIT THESE SETTINGS WITH CAUTION)
@@ -228,24 +226,42 @@ class JFusionAdmin_mrbs extends JFusionAdmin
 				$false_logic['column_name_password'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;column_name_password&#039;&#93; &#61; &#039;password&#039;&#59;";
 				$false_logic['password_format'] = "&#36;auth&#91;&#039;db_ext&#039;&#93;&#91;&#039;password_format&#039;&#93; &#61; &#039;md5&#039;&#59;";
 			}
-			if(count($false_logic) > 0){
-				JFusionAdmin_mrbs::AmmendConfiguration($false_logic);
+			if(count($false_logic) > 0){ // use the db for data also for users
+				JFusionAdmin_mrbs::AmmendConfiguration($false_logic, $storePath);
+				/* PARAMS */
+           		//save the parameters into array
+            	$params = array();
+            	$params['database_host'] = trim($config['db_host']);
+            	$params['database_name'] = trim($config['db_database']);
+            	$params['database_user'] = trim($config['db_login']);
+            	$params['database_password'] = trim($config['db_password']);
+            	$params['database_prefix'] = trim($config['db_tbl_prefix']);
+            	$params['database_type'] = trim($config['dbsys']);
+            	$params['source_path'] = trim($storePath);
+            	$params['cookie_key'] = ''; // not typical but can be modified
+				$params['usergroup'] = 0;
+				//return the parameters so it can be saved permanently
+            	return $params;
 			}
-			
-			/* PARAMS */
-            //save the parameters into array
-            $params = array();
-            $params['database_host'] = trim($config['db_host']);
-            $params['database_name'] = trim($config['db_database']);
-            $params['database_user'] = trim($config['db_login']);
-            $params['database_password'] = trim($config['db_password']);
-            $params['database_prefix'] = trim($config['db_tbl_prefix']);
-            $params['database_type'] = trim($config['dbsys']);
-            $params['source_path'] = trim($storePath);
-            $params['cookie_key'] = ''; // not typical but can be modified
-			$params['usergroup'] = 0;
-			//return the parameters so it can be saved permanently
-            return $params;
+			elseif(count($false_logic) === 0){
+				/* PARAMS */
+            	//save the parameters into array
+            	$params = array();
+            	$params['database_host'] = trim($auth['db_ext']['db_host']);
+            	$params['database_name'] = trim($auth['db_ext']['db_name']);
+            	$params['database_user'] = trim($auth['db_ext']['db_username']);
+            	$params['database_password'] = trim($auth['db_ext']['db_password']);
+            	$params['database_prefix'] = preg_replace('/^([a-zA-Z]*)([_]{1})([a-zA-Z]*)/i', '$1$2', trim($auth['db_ext']['db_table']));
+           		$params['database_type'] = trim($auth['db_ext']['db_system']);
+            	$params['source_path'] = trim($storePath);
+            	$params['cookie_key'] = ''; // not typical but can be modified
+				$params['usergroup'] = 0;
+				//return the parameters so it can be saved permanently
+            	return $params;
+			}
+			else{	
+				return false;
+			}
         }
     }
     function getUserList() {
