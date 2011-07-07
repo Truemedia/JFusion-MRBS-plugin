@@ -306,7 +306,10 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         return $result;
     }
     function getDefaultUsergroup() {
-	    return 'Authenticated user'; //  1 is the value for authenicated users in db field level where level = usergroup
+	    return 'Unknown user'; 
+	    // 0 is the value for unknown users (registered but not allowed access to anything) in db field level where level = usergroup
+	    // 1 is the value for authenicated users in db field level where level = usergroup
+	    // 2 is the value for administrators in db field level where level = usergroup
     }
     function allowRegistration() {
         // MRBS has no registration setup by default, no worries
