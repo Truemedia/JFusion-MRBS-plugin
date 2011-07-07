@@ -280,35 +280,21 @@ class JFusionAdmin_mrbs extends JFusionAdmin
         $db = JFusionFactory::getDatabase($this->getJname());
 		$params = JFusionFactory::getParams($this->getJname());
 		$tbp = $params->get('database_prefix');
-        $query = "SELECT count(*) from " . $tbp . "customer WHERE email NOT LIKE '' and email IS NOT null";
+        $query = "SELECT count(*) from " . $tbp . "users WHERE email NOT LIKE '' and email IS NOT null";
         $db->setQuery($query);
         //getting the results
         $no_users = $db->loadResult();
         return $no_users;
     }
     function getUsergroupList() {
-        //get the connection to the db
-        $db = JFusionFactory::getDatabase($this->getJname());
-		$params = JFusionFactory::getParams($this->getJname());
-		$tbp = $params->get('database_prefix');
-        $query = "SELECT value FROM " . $tbp . "configuration WHERE name IN ('PS_LANG_DEFAULT');";
-        $db->setQuery($query);
-        //getting the default language to load groups
-        $default_language = $db->loadResult();
-        //mrbs uses two group categories which are employees and customers, each have there own groups to access either the front or back end
-        /*
-          Customers only for this plugin
-        */
-        $query = "SELECT id_group as id, name as name from " . $tbp . "group_lang WHERE id_lang IN ('" . $default_language . "');";
-        $db->setQuery($query);
-        //getting the results
-		$result = $db->loadObjectList();
+        // return static information of the 3 groups
+		$result = array('0' => "Unknown user", '1' => "Authenticated users", '2' => "Administrators");
         return $result;
     }
     function getDefaultUsergroup() {
 	    return 'Unknown user'; 
 	    // 0 is the value for unknown users (registered but not allowed access to anything) in db field level where level = usergroup
-	    // 1 is the value for authenicated users in db field level where level = usergroup
+	    // 1 is the value for authenticated users in db field level where level = usergroup
 	    // 2 is the value for administrators in db field level where level = usergroup
     }
     function allowRegistration() {
