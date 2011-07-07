@@ -319,8 +319,8 @@ class JFusionAdmin_mrbs extends JFusionAdmin
 		return $db->loadResult();
     }
     function allowRegistration() {
-        //you cannot disable registration
-            $result = true;
+        // MRBS has no registration setup by default, no worries
+            $result = false;
             return $result;
     }
 	function allowEmptyCookiePath(){
