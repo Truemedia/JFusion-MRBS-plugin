@@ -41,9 +41,8 @@ class JFusionAuth_mrbs extends JFusionAuth
         return 'mrbs';
     }
     function generateEncryptedPassword($userinfo) {
-	/*
-        $params = JFusionFactory::getParams($this->getJname());
-        $the_crypt = md5($params->get('cookie_key') . $userinfo->password_clear);
+	/* This function is configurable depending on chosen encryption (default recommended is md5)
+        $the_crypt = md5($userinfo->password_clear);
         return $the_crypt;*/
     }
 }
