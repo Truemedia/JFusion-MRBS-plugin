@@ -197,280 +197,57 @@ class JFusionUser_mrbs extends JFusionUser {
     function createUser($userinfo, &$status) {
 		$db = JFusionFactory::getDatabase($this->getJname());
 	    $params = JFusionFactory::getParams($this->getJname());
-		require($params->get('source_path') . DS . "classes" . DS . "Validate.php");
-		require($params->get('source_path') . DS . "classes" . DS . "ObjectModel.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Db.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Country.php");
-		require($params->get('source_path') . DS . "classes" . DS . "State.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Tools.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Customer.php");
-		
-		/* split full name into first and with/or without middlename, and lastname */
-		$users_name = $userinfo->name;
-		list( $uf_name, $um_name, $ul_name ) = explode( ' ', $users_name, 3 );
-		if ( is_null($ul_name) ) // meaning only two names were entered
-		{
-			$end_name = $um_name;
-		}
-		else
-		{
-			$end_name = explode( ' ', $ul_name );
-			$size = sizeof($ul_name);
-			$end_name = $ul_name[$size-1];
-		}
-		// now have first name as $uf_name, and last name as $end_name
 		
 		/* user variables submitted through form (emulated) */
-	    $user_variables = array(
-	    'id_gender' => "1", // value of either 1 for male, 2 for female
-	    'firstname' => $uf_name, // alphanumeric values between 6 and 32 charachters long 
-	    'lastname' => $end_name, // alphanumeric values between 6 and 32 charachters long 
-	    'customer_firstname' => $uf_name, // alphanumeric values between 6 and 32 charachters long 
-	    'customer_lastname' => $end_name, // alphanumeric values between 6 and 32 charachters long 
-	    'email' => $userinfo->email, // alphanumeric values aswell as @ and . symbols between 6 and 128 charachters long 
+	    $user_variables = array( 
+	    'name' => $userinfo->name, // alphanumeric values between 6 and 32 charachters long  
 	    'passwd' => $userinfo->password_clear, // alphanumeric values between 6 and 32 charachters long
-	    'days' => "01", // numeric charachter between 1 and 31
-	    'months' => "01", // numeric charachter between 1 and 12
-	    'years' => "2000", // numeric charachter between 1900 and latest year
-	    'newsletter' => 0, // value of either 0 for no newsletters, or 1 to recieve newsletters
-	    'optin' => 0, // value of either 0 for no third party options, or 1 to recieve third party options
-	    'company' => "", // alphanumeric values between 6 and 32 charachters long
-	    'address1' => "Update with your real address", // alphanumeric values between 6 and 128 charachters long
-	    'address2' => "", // alphanumeric values between 6 and 128 charachters long
-	    'postcode' => "Postcode", // alphanumeric values between 7 and 12 charachters long
-	    'city' => "Not known", // alpha values between 6 and 64 charachters long
-	    'id_country' => "17", // numeric charachter between 1 and 244 (normal preset)
-	    'id_state' => "0", // numeric charachter between 1 and 65 (normal preset)
-	    'other' => "", // alphanumeric values with mysql text limit charachters long
-	    'phone' => "", // numeric values between 11 and 16 chrachters long
-	    'phone_mobile' => "", // numeric values between 11 and 16 chrachters long
-	    'alias' => "My address", // alphanumeric values between 6 and 32 charachters long
-	    'dni' => "", // alphanumeric values between 6 and 16 charachters long
+	    'email' => $userinfo->email, // alphanumeric values aswell as @ and . symbols between 6 and 128 charachters long 
 	    );
 		
 		/* array to go into table ps_customer */
-	    $ps_customer = array(
-	    'id_customer' => "NULL", // column 0 (id_customer)
-	    'id_gender' => $user_variables['id_gender'], // column 1 (id_gender)
-	    'id_default_group' => 1, // column 2 (id_default_group)
-	    'secure_key' => md5(uniqid(rand(), true)), // column 3 (secure_key)
+	    $mrbs_user = array(
+	    'id' => "NULL", // column 0 (id_customer)
+	    'level' => 0, // column 1 (id_default_group)
+	    'name' => $user_variables['name'], // column 2 (secure_key)
+	    'passwd' => md5($user_variables['passwd']), // column 3 (passwd)
 	    'email' => $user_variables['email'], // column 4 (email)
-	    'passwd' => md5($params->get('cookie_key') . $user_variables['passwd']), // column 5 (passwd)
-	    'last_passwd_gen' => date("Y-m-d h:m:s",strtotime("-6 hours")), // column 6 (last_passwd_gen)
-	    'birthday' => date("Y-m-d",mktime(0,0,0,$user_variables['months'],$user_variables['days'],$user_variables['years'])), // column 7 (birthday)
-	    'lastname' => $user_variables['lastname'], // column 8 (lastname) 
-	    'newsletter' => $user_variables['newsletter'], // column 9 (newsletter)
-	    'ip_registration_newsletter' => $_SERVER['REMOTE_ADDR'], // column 10 (ip_registration_newsletter)
-	    'newsletter_date_add' => date("Y-m-d h:m:s"), // column 11 (newsletter_date_add)
-	    'optin' => $user_variables['optin'], // column 12 (optin)
-	    'firstname' => $user_variables['firstname'], // column 13 (firstname)
-	    'dni' => $user_variables['dni'], // column 14 (dni)
-	    'active' => 1, // column 15 (active)
-	    'deleted' => 0, // column 16 (deleted)
-	    'date_add' => date("Y-m-d h:m:s"), // column 17 (date_add)
-	    'date_upd' => date("Y-m-d h:m:s") // column 18 (date_upd)
 		);
-		
-		/* array to go into table ps_customer_group */
-	    $ps_customer_group = array(
-	    'id_customer' => "NULL", // column 0 (id_customer)
-	    'id_group' => $params->get('usergroup') // column 1 (id_group)
-	    );
-		
-		/* array to go into table ps_address */
-	    $ps_address = array(
-	    'id_address' => "NULL", // column 0 (id_address)
-	    'id_country' => $user_variables['id_country'], // column 1 (id_country)
-	    'id_state' => $user_variables['id_state'], // column 2 (id_state)
-	    'id_customer' => "NULL", // column 3 (id_customer)
-	    'id_manufacturer' => 0, // column 4 (id_manufacturer)
-	    'id_supplier' => 0, // column 5 (id_supplier)
-	    'alias' => $user_variables['alias'], // column 6 (alias)
-	    'company' => $user_variables['company'], // column 7 (company)
-	    'lastname' => $user_variables['customer_lastname'], // column 8 (lastname)
-	    'firstname' => $user_variables['customer_firstname'], // column 9 (firstname)
-	    'address1' => $user_variables['address1'], // column 10 (address1)
-	    'address2' => $user_variables['address2'], // column 11 (address2)
-	    'postcode' => $user_variables['postcode'], // column 12 (postcode)
-	    'city' => $user_variables['city'], // column 13 (city)
-	    'other' => $user_variables['other'], // column 14 (other)
-	    'phone' => $user_variables['phone'], // column 15 (phone)
-	    'phone_mobile' => $user_variables['phone_mobile'], // column 16 (phone_mobile)
-	    'date_add' => date("Y-m-d h:m:s"), // column 17 (date_add)
-	    'date_upd' => date("Y-m-d h:m:s"), // column 18 (date_upd)
-	    'active' => 1, // column 19 (active)
-	    'deleted' => 0 // column 20 (deleted)
-	    );
 		
 		/* safe data check and validation of array $user_variables
 	    no other unique variables are used so this check only includes these */
 	
-	    // Validate gender
-	    if (!Validate::isGenderIsoCode($user_variables['id_gender'])){
-		    $errors[] = Tools::displayError('gender not valid');
-		    unset($ps_customer);
+		// Validate level
+	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['level'])){
+	        $errors[] = Tools::displayError('level wrong');
+	        unset($mrbs_user);
 	    }
 	
-        // Validate first name
-	    if (!Validate::isName($user_variables['firstname'])){
-	        $errors[] = Tools::displayError('first name wrong');
-	        unset($ps_customer);
+        // Validate full name
+	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['name'])){
+	        $errors[] = Tools::displayError('full name wrong');
+	        unset($mrbs_user);
 	    }
 	 
-	    // Validate second name
-	    if (!Validate::isName($user_variables['lastname'])){
-	        $errors[] = Tools::displayError('second name wrong');
-	        unset($ps_customer);
-	    }
-	 
-	    // Validate address first name
-	    if (!Validate::isName($user_variables['customer_firstname'])){
-	        $errors[] = Tools::displayError('customer first name wrong');
-	        unset($ps_address);
-	    }
-	 
-	    // Validate address last name
-	    if (!Validate::isName($user_variables['customer_lastname'])){
-	        $errors[] = Tools::displayError('customer second name wrong');
-	        unset($ps_address);
-	    }
-	
-	    // Validate email
-	    if (!Validate::isEmail($user_variables['email'])){
-	        $errors[] = Tools::displayError('e-mail not valid');
-	        unset($ps_customer);
-	    }
-	 
-	    // Validate password
-	    if (!Validate::isPasswd($user_variables['passwd'])){
+	 	// Validate password
+	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['passwd'])){
 	        $errors[] = Tools::displayError('invalid password');
-	        unset($ps_customer);
+	        unset($mrbs_user);
 	    }
-	
-	    // Validate date of birth 
-	    if (!@checkdate($user_variables['months'], $user_variables['days'], $user_variables['years']) AND !( $user_variables['months']== '' AND $user_variables['days'] == '' AND $user_variables['years'] == '')){
-		    $errors[] = Tools::displayError('invalid birthday');
-		    unset($ps_customer);
-	    }
-	 
-	    // Validate newsletter checkbox
-        if (!Validate::isBool($user_variables['newsletter'])){
-	        $errors[] = Tools::displayError('newsletter invalid choice');
-	        unset($ps_customer);
-	    }
-	 
-	    // Validate special offers from partners checkbox
-	    if (!Validate::isBool($user_variables['optin'])){
-	        $errors[] = Tools::displayError('optin invalid choice');
-	        unset($ps_customer);
-	    }
-	 
-	    // Validate company/orginization
-	    if (!Validate::isGenericName($user_variables['company'])){
-	        $errors[] = Tools::displayError('company name wrong');
-	        unset($ps_address);
-	    }
-	 
-	    // Do not validate address line 1 since a placeholder is been curently used
-	    /*if (!Validate::isAddress($user_variables['address1'])){
-	        $errors[] = Tools::displayError('address wrong');
-	        unset($ps_address);
-	    }*/
-	 
-	    // Validate address line 2
-	    if (!Validate::isAddress($user_variables['address2'])){
-	        $errors[] = Tools::displayError('address 2nd wrong');
-	        unset($ps_address);
-	    }
-
-	    // Do not validate postcode since a placeholder is been curently used
-	    /*if (!Validate::isPostCode($user_variables['postcode'])){
-	        $errors[] = Tools::displayError('postcode wrong');
-	        unset($ps_address);
-	    }*/
-	 
-	    // Validate phone number
-	    if (!Validate::isPhoneNumber($user_variables['phone'])){
-	        $errors[] = Tools::displayError('invalid phone');
-	        unset($ps_address);
-	    }
-	 
-	    // Validate mobile number
-	    if (!Validate::isPhoneNumber($user_variables['phone_mobile'])){
-	        $errors[] = Tools::displayError('invalid mobile');
-	        unset($ps_address);
-	    }
-	
-	    // Do not validate village/town/city since a placeholder is been curently used
-	    /*if (!Validate::isCityName($user_variables['city'])){
-	        $errors[] = Tools::displayError('invalid village/town/city');
-	        unset($ps_address);
-	    }*/
-	
-	    // Validate country
-	    if (!Validate::isInt($user_variables['id_country'])){
-	        $errors[] = Tools::displayError('invalid country');
-	        unset($ps_address);
-        }
-	    elseif (Country::getIsoById($user_variables['id_country']) === ""){
-	        $errors[] = Tools::displayError('invalid country');
-	        unset($ps_address);
-	    }
-	
-	    // Validate state
-	    if (!Validate::isInt($user_variables['id_state'])){
-	        $errors[] = Tools::displayError('invalid state');
-	        unset($ps_address);
-        }
-	    elseif (!State::getNameById($user_variables['id_state'])){
-	        if($user_variables['id_state'] === "0"){
-	            /* state valid to apply for none state */ 
-	        }
-	        else{
-	            $errors[] = Tools::displayError('invalid state');
-	            unset($ps_address);
-	        }
-	    }
-	
-	    // Validate DNI
-	    $validateDni = Validate::isDni($user_variables['dni']);
-	    if ($user_variables['dni'] != NULL AND $validateDni != 1){
-		    $error = array(
-		    0 => Tools::displayError('DNI isn\'t valid'),
-		    -1 => Tools::displayError('this DNI has been already used'),
-		    -2 => Tools::displayError('NIF isn\'t valid'),
-		    -3 => Tools::displayError('CIF isn\'t valid'),
-		    -4 => Tools::displayError('NIE isn\'t valid')
-		    );
-		    $errors[] = $error[$validateDni];
-		    unset($ps_customer);
-	    }
-	
-	    // Validate alias
-	    elseif (!Validate::isMessage($user_variables['alias'])){
-	        $errors[] = Tools::displayError('invalid alias');
-	        unset($ps_address);
-	    }
-	
-        // Validate extra information 	
-	    elseif (!Validate::isMessage($user_variables['other'])){
-	        $errors[] = Tools::displayError('invalid extra information');
-	        unset($ps_address);
-	    }
-	
-	    /* Check if account already exists (not a validation) */
-	    elseif (Customer::customerExists($user_variables['email'])){
-	        $errors[] = Tools::displayError('someone has already registered with this e-mail address');
-	        unset($ps_customer);
+	    
+	    // Validate email
+	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['email'])){
+	        $errors[] = Tools::displayError('e-mail not valid');
+	        unset($mrbs_user);
 	    }
 		
 		/* enter customer account into mrbs database */ // if all information is validated
-	    if(isset($ps_customer) && isset($ps_customer_group) && isset($ps_address))
+	    if(isset($mrbs_user))
 	    {
 	        $tbp = $params->get('database_prefix');
-	        foreach($ps_customer as $key => $value){
-	            if($key == "id_customer" || $key == "secure_key" || $key == "last_passwd_gen" || $key == "newsletter_date_add" || $key == "date_add" || $key == "date_upd"){
-	                if($key == "id_customer"){
+	        foreach($mrbs_user as $key => $value){
+	            if($key == "id" || $key == "name" || $key == "passwd" || $key == "email"){
+	                if($key == "id"){
 	                    $insert_sql_columns = "INSERT INTO " . $tbp . "customer (";
                         $insert_sql_values = "VALUES ("; 
 			        }
@@ -481,7 +258,7 @@ class JFusionUser_mrbs extends JFusionUser {
 					}
 	            }
 				
-	            elseif($key == "id_gender"){
+	            elseif($key == "level"){
 	                $insert_sql_columns .= "" . $key;
                     $insert_sql_values .= "'" . $value . "'";
                 }
@@ -498,7 +275,7 @@ class JFusionUser_mrbs extends JFusionUser {
 			$result = $db->query();
 	
 	        // enter customer group into database 
-	        $query="SELECT id_customer FROM " . $tbp . "customer WHERE email = '" . $ps_customer['email'] . "'";
+	        $query="SELECT id_customer FROM " . $tbp . "customer WHERE email = '" . $mrbs_user['email'] . "'";
             $db->setQuery($query);
 			$result = $db->loadResult();
 		    if (!$result)
@@ -508,11 +285,11 @@ class JFusionUser_mrbs extends JFusionUser {
 			}
 			else
 			{
-	            $ps_customer_group['id_customer'] = $result;
+	            $mrbs_user_group['id_customer'] = $result;
                 $ps_address['id_customer'] = $result;
 			}
 			
-	        foreach($ps_customer_group as $key => $value){
+	        foreach($mrbs_user_group as $key => $value){
 	            if($key == "id_customer"){
 	                $insert_sql_columns = "INSERT INTO " . $tbp . "customer_group (" . $key;
                     $insert_sql_values = "VALUES ('" . $value . "'";
