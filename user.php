@@ -218,7 +218,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	    no other unique variables are used so this check only includes these */
 	
 		// Validate level
-	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['level'])){
+	    if (!is_numeric($user_variables['level']) || $user_variables['level'] > 2 || $user_variables['level'] < 0){
 	        $errors[] = Tools::displayError('level wrong');
 	        unset($mrbs_user);
 	    }
@@ -230,13 +230,13 @@ class JFusionUser_mrbs extends JFusionUser {
 	    }
 	 
 	 	// Validate password
-	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['passwd'])){
+	    if (!preg_match("/^([a-zA-Z0-9])$/", $user_variables['passwd'])){
 	        $errors[] = Tools::displayError('invalid password');
 	        unset($mrbs_user);
 	    }
 	    
 	    // Validate email
-	    if (!preg_match("/^([a-zA-Z])+([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])*(\s){0,1}([\'\-]){0,1}([a-zA-Z])+$/", $user_variables['email'])){
+	    if (!preg_match("/^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/", $user_variables['email'])){
 	        $errors[] = Tools::displayError('e-mail not valid');
 	        unset($mrbs_user);
 	    }
