@@ -248,7 +248,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	        foreach($mrbs_user as $key => $value){
 	            if($key == "id" || $key == "name" || $key == "passwd" || $key == "email"){
 	                if($key == "id"){
-	                    $insert_sql_columns = "INSERT INTO " . $tbp . "customer (";
+	                    $insert_sql_columns = "INSERT INTO " . $tbp . "users (";
                         $insert_sql_values = "VALUES ("; 
 			        }
 					
@@ -273,69 +273,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	        $query = $insert_sql_columns . $insert_sql_values;
 	        $db->setQuery($query);
 			$result = $db->query();
-	
-	        // enter customer group into database 
-	        $query="SELECT id_customer FROM " . $tbp . "customer WHERE email = '" . $mrbs_user['email'] . "'";
-            $db->setQuery($query);
-			$result = $db->loadResult();
-		    if (!$result)
-			{
-			    JText::_('REGISTRATION_ERROR');
-			    echo('no matching userid');
-			}
-			else
-			{
-	            $mrbs_user_group['id_customer'] = $result;
-                $ps_address['id_customer'] = $result;
-			}
-			
-	        foreach($mrbs_user_group as $key => $value){
-	            if($key == "id_customer"){
-	                $insert_sql_columns = "INSERT INTO " . $tbp . "customer_group (" . $key;
-                    $insert_sql_values = "VALUES ('" . $value . "'";
-                }
-	            else{
-                    $insert_sql_columns .= ", " . $key;
-                    $insert_sql_values .= ", '" . $value . "'";
-                }
-	        }
-			
-	        $insert_sql_columns .= ")";
-            $insert_sql_values .= ")";
-	        $query = $insert_sql_columns . $insert_sql_values;
-	        $db->setQuery($query);
-			$result = $db->query();
-	 
-	        // enter customer address into database after
-	        foreach($ps_address as $key => $value){
-                if($key == "id_address" || $key == "id_customer" || $key == "date_add" || $key == "date_upd"){
-	                if($key == "id_address"){
-	                    $insert_sql_columns = "INSERT INTO " . $tbp . "address (";
-                        $insert_sql_values = "VALUES ('"; 
-				    }
-	                else{
-	                    $insert_sql_columns .= ", " . $key;
-                        $insert_sql_values .= ", '" . $value . "'"; 
-				    }
-			    }
-	            elseif($key == "id_country"){
-	                $insert_sql_columns .= $key;
-                    $insert_sql_values .= $value . "'";
-	            }
-	            else{
-	                $insert_sql_columns .= ", " . $key;
-                    $insert_sql_values .= ", '" . $value . "'";
-	            }
-	        }
-			
-	        $insert_sql_columns .= ")";
-            $insert_sql_values .= ")";
-	        $query = $insert_sql_columns . $insert_sql_values;
-	        $db->setQuery($query);
-			$result = $db->query();
-			$status['debug'][] = JText::_('USER_CREATION');
-            $status['userinfo'] = $this->getUser($userinfo);
-		    return;
+
 		}
 	    else{ 
 	        foreach ($errors as $key){
