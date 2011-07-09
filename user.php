@@ -80,14 +80,6 @@ class JFusionUser_mrbs extends JFusionUser {
         $status['debug'] = array();
 	    // use mrbs cookie class and functions to delete cookie
 		$params = JFusionFactory::getParams($this->getJname());
-		require_once $params->get('source_path') . DS . "config" . DS . "settings.inc.php";
-	    require($params->get('source_path') . DS . "classes" . DS . "Cookie.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Blowfish.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Tools.php");
-		require($params->get('source_path') . DS . "classes" . DS . "ObjectModel.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Db.php");
-		require($params->get('source_path') . DS . "classes" . DS . "SubDomain.php");
-        $cookie = new cookie('ps');
 		$status["error"][] = "Random debugging text";
 	    if(!$cookie->mylogout())
 		{
@@ -106,15 +98,6 @@ class JFusionUser_mrbs extends JFusionUser {
         $status['debug'] = array();
         // this uses a code extract from authentication.php that deals with logging in completely
 		$db = JFusionFactory::getDatabase($this->getJname());
-		require_once $params->get('source_path') . DS . "config" . DS . "settings.inc.php";
-	    require($params->get('source_path') . DS . "classes" . DS . "Cookie.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Blowfish.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Tools.php");
-		require($params->get('source_path') . DS . "classes" . DS . "ObjectModel.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Db.php");
-		require($params->get('source_path') . DS . "classes" . DS . "SubDomain.php");
-		require($params->get('source_path') . DS . "classes" . DS . "Validate.php");
-		$cookie = new cookie('ps');
 		$password = $userinfo->password_clear;
 	    $email = $userinfo->email;
 		$password = trim($password);
