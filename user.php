@@ -230,7 +230,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	    }
 	 
 	 	// Validate password
-	    if (!preg_match("/^([a-zA-Z0-9])*$/", $user_variables['password'])){
+	    if (!preg_match("/^([a-zA-Z0-9])+$/", $user_variables['password'])){
 	        $errors[] = 'invalid password';
 	        unset($mrbs_user);
 	    }
