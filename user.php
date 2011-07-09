@@ -43,7 +43,7 @@ class JFusionUser_mrbs extends JFusionUser {
 		$db = JFusionFactory::getDatabase($this->getJname());
         $params = JFusionFactory::getParams($this->getJname());
 		$tbp = $params->get('database_prefix');
-        $query = "SELECT id_customer as userid, email, passwd as password, firstname, lastname FROM " . $tbp . "customer WHERE email ='" . $identifier . "'";
+        $query = "SELECT id as userid, email, passwd as password, name FROM " . $tbp . "users WHERE email ='" . $identifier . "'";
         $db->setQuery($query);
         $result = $db->loadObject();
         // read through params for cookie key (the salt used)
