@@ -43,7 +43,7 @@ class JFusionUser_mrbs extends JFusionUser {
 		$db = JFusionFactory::getDatabase($this->getJname());
         $params = JFusionFactory::getParams($this->getJname());
 		$tbp = $params->get('database_prefix');
-        $query = "SELECT id as userid, email, passwd as password, name FROM " . $tbp . "users WHERE email ='" . $identifier . "'";
+        $query = "SELECT id as userid, email, password as password, name FROM " . $tbp . "users WHERE email ='" . $identifier . "'";
         $db->setQuery($query);
         $result = $db->loadObject();
         // read through params for cookie key (the salt used)
@@ -115,9 +115,9 @@ class JFusionUser_mrbs extends JFusionUser {
 		require($params->get('source_path') . DS . "classes" . DS . "SubDomain.php");
 		require($params->get('source_path') . DS . "classes" . DS . "Validate.php");
 		$cookie = new cookie('ps');
-		$passwd = $userinfo->password_clear;
+		$password = $userinfo->password_clear;
 	    $email = $userinfo->email;
-		$passwd = trim($passwd);
+		$password = trim($password);
 		$email = trim($email);
 		if (empty($email))
 		{
@@ -129,17 +129,17 @@ class JFusionUser_mrbs extends JFusionUser {
 		    JText::_('EMAIL_UPDATE_ERROR');
 		    echo('invalid e-mail address');
 		}
-		elseif (empty($passwd))
+		elseif (empty($password))
 		{
 		    JText::_('EMAIL_UPDATE_ERROR');
 		    echo('password is required');
 		}
-		elseif (Tools::strlen($passwd) > 32)
+		elseif (Tools::strlen($password) > 32)
 		{
 		    JText::_('EMAIL_UPDATE_ERROR');
 		    echo('password is too long');
 		}
-		elseif (!Validate::isPasswd($passwd))
+		elseif (!Validate::isPasswd($password))
 		{
 		    JText::_('EMAIL_UPDATE_ERROR');
 		    echo('invalid password');
@@ -150,7 +150,7 @@ class JFusionUser_mrbs extends JFusionUser {
 		    sleep(1);
 			// check if password matches
 			$tbp = $params->get('database_prefix');
-			$query = "SELECT passwd FROM " . $tbp . "customer WHERE email ='" . $email . "'";
+			$query = "SELECT password FROM " . $tbp . "customer WHERE email ='" . $email . "'";
             $db->setQuery($query);
             $result = $db->loadResult();
 		    if (!$result)
@@ -160,13 +160,13 @@ class JFusionUser_mrbs extends JFusionUser {
 			}
 		    else
 		    {
-				if(md5($params->get('cookie_key') . $passwd) === $result)
+				if(md5($params->get('cookie_key') . $password) === $result)
 				{
 				$cookie->__set("id_customer", $userinfo->userid);
 				$cookie->__set("customer_lastname", $userinfo->lastname);
 				$cookie->__set("customer_firstname", $userinfo->firstname);
 				$cookie->__set("logged", 1);
-				$cookie->__set("passwd", md5($params->get('cookie_key') . $passwd));
+				$cookie->__set("password", md5($params->get('cookie_key') . $password));
 				$cookie->__set("email", $email);
 				return true;
 				}
@@ -201,7 +201,7 @@ class JFusionUser_mrbs extends JFusionUser {
 		/* user variables submitted through form (emulated) */
 	    $user_variables = array( 
 	    'name' => $userinfo->name, // alphanumeric values between 6 and 32 charachters long  
-	    'passwd' => $userinfo->password_clear, // alphanumeric values between 6 and 32 charachters long
+	    'password' => $userinfo->password_clear, // alphanumeric values between 6 and 32 charachters long
 	    'email' => $userinfo->email, // alphanumeric values aswell as @ and . symbols between 6 and 128 charachters long 
 	    );
 		
@@ -210,7 +210,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	    'id' => "NULL", // column 0 (id_customer)
 	    'level' => 0, // column 1 (id_default_group)
 	    'name' => $user_variables['name'], // column 2 (secure_key)
-	    'passwd' => md5($user_variables['passwd']), // column 3 (passwd)
+	    'password' => md5($user_variables['password']), // column 3 (password)
 	    'email' => $user_variables['email'], // column 4 (email)
 		);
 		
@@ -230,7 +230,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	    }
 	 
 	 	// Validate password
-	    if (!preg_match("/^([a-zA-Z0-9])$/", $user_variables['passwd'])){
+	    if (!preg_match("/^([a-zA-Z0-9])*$/", $user_variables['password'])){
 	        $errors[] = 'invalid password';
 	        unset($mrbs_user);
 	    }
@@ -246,7 +246,7 @@ class JFusionUser_mrbs extends JFusionUser {
 	    {
 	        $tbp = $params->get('database_prefix');
 	        foreach($mrbs_user as $key => $value){
-	            if($key == "id" || $key == "name" || $key == "passwd" || $key == "email"){
+	            if($key == "id" || $key == "name" || $key == "password" || $key == "email"){
 	                if($key == "id"){
 	                    $insert_sql_columns = "INSERT INTO " . $tbp . "users (";
                         $insert_sql_values = "VALUES ("; 
