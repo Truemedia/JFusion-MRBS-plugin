@@ -78,17 +78,23 @@ class JFusionUser_mrbs extends JFusionUser {
 	    $status = array();
         $status['error'] = array();
         $status['debug'] = array();
-	    // use mrbs cookie class and functions to delete cookie
+	     // use mrbs cookie class and functions to delete cookie
 		$params = JFusionFactory::getParams($this->getJname());
-		$status["error"][] = "Random debugging text";
-	    if(!$cookie->mylogout())
-		{
-		 $status["error"][] = "Error Could not delete session, doesn't exist";
-		}
-		else
-		{
-		 $status["debug"][] = "Deleted session and session data";
-		}
+    		// session has started
+    		session_regenerate_id();
+			session_destroy();
+			session_name("MRBS_SESSID");  // call before session_set_cookie_params() - see PHP manual
+			session_set_cookie_params(time() - 3600, '/mrbs/web/');
+			session_start();
+			session_unset();
+			if(!session_destroy())
+			{
+				$status["error"][] = "Error Could not delete session, doesn't exist";
+			}
+			else
+			{
+				$status["debug"][] = "Deleted session and session data";
+			}
 		return $status;
     }
     function createSession($userinfo, $options, $framework = true) {
@@ -129,37 +135,122 @@ class JFusionUser_mrbs extends JFusionUser {
 		}
 		else
 	    { 
-		    /* Handle brute force attacks */
-		    sleep(1);
-			// check if password matches
-			$tbp = $params->get('database_prefix');
-			$query = "SELECT password FROM " . $tbp . "customer WHERE email ='" . $email . "'";
-            $db->setQuery($query);
-            $result = $db->loadResult();
-		    if (!$result)
-			{
-			    JText::_('EMAIL_UPDATE_ERROR');
-			    echo('authentication failed');
-			}
-		    else
-		    {
-				if(md5($params->get('cookie_key') . $password) === $result)
-				{
-				$cookie->__set("id_customer", $userinfo->userid);
-				$cookie->__set("customer_lastname", $userinfo->lastname);
-				$cookie->__set("customer_firstname", $userinfo->firstname);
-				$cookie->__set("logged", 1);
-				$cookie->__set("password", md5($params->get('cookie_key') . $password));
-				$cookie->__set("email", $email);
-				return true;
-				}
-				else
-				{
-					JText::_('EMAIL_UPDATE_ERROR');
-					echo('wrong password');
-				}
-			}
-		}
+/*****************************************************************************\
+*                                                                             *
+*   Code from File name       session_php.inc                                 *
+*                                                                             *
+*   Description     Use PHP built-in sessions handling                        *
+*                                                                             *
+*   Notes           To use this authentication scheme, set in                 *
+*                   config.inc.php:                                           *
+*                       $auth["session"]  = "php";                            *
+*                                                                             *                          *
+\*****************************************************************************/
+global $PHP_SELF;
+
+// Get non-standard form variables
+/*$Action = get_form_var('Action', 'string');
+$NewUserName = get_form_var('NewUserName', 'string');
+$NewUserPassword = get_form_var('NewUserPassword', 'string');
+$TargetURL = get_form_var('TargetURL', 'string');
+$returl = get_form_var('returl', 'string');*/
+
+if (isset($cookie_path_override))
+{
+  $cookie_path = $cookie_path_override;
+}
+else
+{
+  $cookie_path = $PHP_SELF;
+  // Strip off everything after the last '/' in $PHP_SELF
+  $cookie_path = preg_replace('/[^\/]*$/', '', $cookie_path);
+}
+
+global $auth;
+
+if (!isset($auth["session_php"]["session_expire_time"]))
+{
+  // Default to the behaviour of previous versions of MRBS, use only
+  // session cookies - no persistent cookie.
+  $auth["session_php"]["session_expire_time"] = 0;
+}
+
+session_name("MRBS_SESSID");  // call before session_set_cookie_params() - see PHP manual
+session_set_cookie_params($auth["session_php"]["session_expire_time"],
+                          $cookie_path);
+session_start();
+
+/*
+  Target of the form with sets the URL argument "Action=SetName".
+  Will eventually return to URL argument "TargetURL=whatever".
+*/
+if (isset($Action) && ($Action == "SetName"))
+{
+  /* First make sure the password is valid */
+  if ($NewUserName == "")
+  {
+
+    // Unset the session variables
+    if (isset($_SESSION))
+    {
+      $_SESSION = array();
+    }
+    else
+    {
+      global $HTTP_SESSION_VARS;
+      $HTTP_SESSION_VARS = array();
+    }
+  }
+  else
+  {
+    if (!authValidateUser($NewUserName, $NewUserPassword))
+    {
+      print_header(0, 0, 0, 0, "");
+      echo "<p>".get_vocab('unknown_user')."</p>\n";
+      printLoginForm($TargetURL);
+      exit();
+    }
+
+    if (isset($_SESSION))
+    {
+      $_SESSION["UserName"] = $NewUserName;
+    }
+    else
+    {
+      global $HTTP_SESSION_VARS;
+      $HTTP_SESSION_VARS["UserName"] = $NewUserName;
+    }
+  }
+  // preserve the original $HTTP_REFERER by sending it as a GET parameter
+  if (!empty($returl))
+  {
+    // check to see whether there's a query string already
+    if (strpos($TargetURL, '?') === false)
+    {
+      $TargetURL .= "?returl=" . urlencode($returl);
+    }
+    else
+    {
+      $TargetURL .= "&returl=" . urlencode($returl);
+    }
+  }
+
+
+function getUserName()
+{
+  if (isset($_SESSION) && isset($_SESSION["UserName"]) && ($_SESSION["UserName"] != ""))
+  {
+    return $_SESSION["UserName"];
+  }
+  else
+  {
+    global $HTTP_SESSION_VARS;
+    if (isset($HTTP_SESSION_VARS["UserName"]) && ($HTTP_SESSION_VARS["UserName"] != ""))
+    {
+      return $HTTP_SESSION_VARS["UserName"];
+    }
+  }
+}
 	}
     function filterUsername($username) {
         return $username;
