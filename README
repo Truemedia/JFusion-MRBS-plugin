@@ -29,7 +29,7 @@ Once installed the plugin just needs configuring and the settings tested to conf
 
 Add the following code to your MRBS configuration file (config.inc.php) which is located in the folder where you installed MRBS, 
 and modify the information in the variables to suit your setup (DB and secret key).
-<tt>/*********************************************************************
+/*********************************************************************
 * JFusion authentification settings (EDIT THESE SETTINGS WITH CAUTION)
 *********************************************************************/
 // How to validate the user/password. One of "none", "config", "db", "db_ext" (this is DEFAULT that JFusion adds), "pop3", "imap", "ldap" "nis" "nw" "ext"
@@ -56,17 +56,17 @@ $auth['db_ext']['column_name_password'] = 'password';
 // This is the format of the password entries in the table. You can specify 'md5', 'sha1', 'crypt' or 'plaintext'
 $auth['db_ext']['password_format'] = 'md5';
 $auth["session"]  = "cookie";
-$auth['session_cookie']['secret'] = "random_secret_numbers_and_letters_you_want_to_use";</tt>
+$auth['session_cookie']['secret'] = "random_secret_numbers_and_letters_you_want_to_use";
 
 You will also need to edit the following file of the MRBS plugin which is "user.php" located at this URL: 
 "http://yoursite.com/joomladirectory/administrator/components/com_jfusion/plugins/mrbs/user.php" which will have a simillar variation on your site
 where you will need to add some settings which currently need manually writing into the file, although a future update will soon make this configuration procedure unecessary.
 
 Open this file either through an FTP client or web based file browser and change the following settings at the following lines with the settings relevant to your site.
-Line 170 (<tt>$secretz = "";</tt>), inbetween the quotes ("") write the secret session key you used in your MRBS configuration file,
-which was <tt>$auth['session_cookie']['secret'] = "random_secret_numbers_and_letters_you_want_to_use";</tt>
+Line 170 ($secretz = "";), inbetween the quotes ("") write the secret session key you used in your MRBS configuration file,
+which was $auth['session_cookie']['secret'] = "random_secret_numbers_and_letters_you_want_to_use";
 
-Also at Line 172 of the "user.php" file (<tt>setcookie("SessionToken", $blowfish->encrypt($token), time() + 3600*24*30, '/mrbs/web/');</tt>) replace <tt>/mrbs/web/</tt> with your MRBS directory relevant to your
+Also at Line 172 of the "user.php" file (setcookie("SessionToken", $blowfish->encrypt($token), time() + 3600*24*30, '/mrbs/web/');) replace /mrbs/web/ with your MRBS directory relevant to your
 websites root folder. Once these steps have been completed along with the standard JFusion configuration everything should be working fine and you should be able to now use JFusion to login, logout, and register in MRBS.
 
 If you are having any problems with these instructions or your plugin isn't working correctly feel free to ask for support by visiting www.jfusion.org and posting a topic in the general support forum
